@@ -181,3 +181,7 @@ dnx-coreclr-win-x86*/
 
 # Gemfile.lock
 Gemfile.lock
+
+*.d.ts
+*.js
+*.js.map
