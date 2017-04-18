@@ -9,7 +9,7 @@ This tool assists in writing/validating OpenAPI specs in Visual Studio Code.
 
 ## Installing Extension
 
-Extension is published at Visual Studio Code Marketplace [https://marketplace.visualstudio.com/items?itemName=ms-vscode.autorest](https://marketplace.visualstudio.com/items?itemName=ms-vscode.autorest)
+Download [https://marketplace.visualstudio.com/items?itemName=ms-vscode.autorest](https://marketplace.visualstudio.com/items?itemName=ms-vscode.autorest)
 
 ## Updating this extension and/or AutoRest
 
@@ -18,7 +18,13 @@ Extension is published at Visual Studio Code Marketplace [https://marketplace.vi
 
 ## What to expect?
 
-This extension currently uses AutoRest to surface validation errors in OpenAPI specs. It provides json schema validation and linting for Azure Resource Management specs (https://github.com/Azure/azure-rest-api-specs).
+This extension currently uses AutoRest to surface validation errors in OpenAPI specs. It provides json schema validation and linting for [Azure Resource Management specs](https://github.com/Azure/azure-rest-api-specs).
+
+After installing the extension, opening an OpenAPI spec, will kick off AutoRest validation and report any errors/warning in the "Problems" window of Visual Studio Code, squiggles will also show up for errors/warnings and hovering over the item will provide more information. 
+
+# <img align="center" src="./images/VScode-extension.png">
+
+### Advanced usage
 
 To customize validation please use AutoRest [configuration file](https://github.com/Azure/autorest/tree/97b68250afd96111f79047e24e22eeb82a30426f/src/autorest-core/test/variations/suppressions):
 - Input files: If you're working with a "composite" spec, please list the files under "input-file" setting. See [configuration file](https://github.com/Azure/autorest/tree/97b68250afd96111f79047e24e22eeb82a30426f/src/autorest-core/test/variations/suppressions) example.
