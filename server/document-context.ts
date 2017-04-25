@@ -30,6 +30,12 @@ export class DocumentContext extends EventEmitter implements IFileSystem {
     if (!this._autoRest) {
       this._autoRest = new AutoRest(this, this.configurationFile);
       this._autoRest.AddConfiguration({ "output-artifact": ["swagger-document", "swagger-document.map"] });
+      
+      // debug and verbose messages are not sent by default.
+      // by adding these, we can ensure vscode always get them (and it can decide if it shows them or not)
+      // (this was the default before, but it's being changed)
+      this._autoRest.AddConfiguration({ "debug": true});
+      this._autoRest.AddConfiguration({ "verbose": true});
 
       this.Manager.listenForResults(this._autoRest);
       this.autorest.GeneratedFile.Subscribe((instance, artifact) => {
