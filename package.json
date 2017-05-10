@@ -1,7 +1,7 @@
 {
   "name": "autorest",
   "displayName": "AutoRest",
-  "description": "AutoRest/Swagger Langugage Service",
+  "description": "AutoRest/Swagger Language Service",
   "author": "Microsoft Corporation",
   "license": "MIT",
   "version": "0.12.2",
@@ -77,7 +77,7 @@
             "verbose"
           ],
           "default": "off",
-          "description": "Traces the communication between VSCode and the AutoRest Langugage Service"
+          "description": "Traces the communication between VSCode and the AutoRest Language Service"
         }
       }
     }
