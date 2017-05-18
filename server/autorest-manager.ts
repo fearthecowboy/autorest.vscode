@@ -29,6 +29,8 @@ export let settings: Settings = (<any>global).settings;
 
 export class AutoRestManager extends TextDocuments {
   private trackedFiles = new Map<string, TrackedFile>();
+
+  // Map of "path to file/folder" and its document context 
   private activeContexts = new Map<string, DocumentContext>();
   private _rootUri: string | null = null;
   public get settings(): Settings {
@@ -101,39 +103,7 @@ export class AutoRestManager extends TextDocuments {
     // documents.all().forEach(validateTextDocument);
   };
 
-  // This handler resolve additional information for the item selected in
-  // the completion list.
-  onCompletionResolve(item: CompletionItem): CompletionItem {
-    if (item.data === 1) {
-      item.detail = 'TypeScript details',
-        item.documentation = 'TypeScript documentation'
-    } else if (item.data === 2) {
-      item.detail = 'JavaScript details',
-        item.documentation = 'JavaScript documentation'
-    }
-    return item;
-  };
-
-  onCompletion(textDocumentPosition: TextDocumentPositionParams): CompletionItem[] {
-    // The pass parameter contains the position of the text document in 
-    // which code complete got requested. For the example we ignore this
-    // info and always provide the same completion items.
-    return [
-      {
-        label: 'TypeScript',
-        kind: CompletionItemKind.Text,
-        data: 1
-      },
-      {
-        label: 'JavaScript',
-        kind: CompletionItemKind.Text,
-        data: 2
-      }
-    ]
-  };
-
   private changedOnDisk(changes: DidChangeWatchedFilesParams) {
-
     // files on disk changed in the workspace. Let's see if we care.
     // changes.changes[0].type 1/2/3 == created/changed/deleted
     // changes.changes[0].uri
@@ -176,11 +146,11 @@ export class AutoRestManager extends TextDocuments {
       f.SetContent(documentContent);
     }
 
-    // check if it's a swagger?
-    let content = await (await f).content; // get the content to see if we should be doing something with this.
     return f;
   }
 
+  // Finds the folder the document is in, creates or returns existing document context based on folder path 
+  // (there should only be one config file per folder)
   private async GetDocumentContextForDocument(documentUri: string): Promise<DocumentContext> {
     documentUri = NormalizeUri(documentUri);
     // get the folder for this documentUri
@@ -191,29 +161,34 @@ export class AutoRestManager extends TextDocuments {
       this.debug(`Configuration File Selected: ${configFile}`);
 
 
-      folder = path.dirname(configFile);
+      folder = path.dirname(configFile);  // updating folder, in case config file was found in another folder in the hierarchy
       // do we have this config already?
       let ctx = this.activeContexts.get(folder);
       if (!ctx) {
         ctx = new DocumentContext(this, folder, configFile);
         this.activeContexts.set(folder, ctx);
+        this.activeContexts.set(documentUri, ctx);
       }
       // if the file is the config file itself.
-      if (configFile == documentUri) {
-        // since we're creating a new context, might as well activate it now.
-        ctx.Track(await this.AcquireTrackedFile(configFile));
-        ctx.Activate();
+      if (configFile === documentUri) {
+        // look into acquiring the rest of the files in this config file
+        let files = [...(await ctx.autorest.view).InputFileUris]
+        for (const fn of files) {
+          // acquire each of the docs in the config file
+          ctx.ReadFile(fn);
+          this.activeContexts.set(fn, ctx);
+          ctx.Track(await this.AcquireTrackedFile(fn));
+        }
         return ctx;
       }
 
-      // or is in in this found configuration file?
+      // is the documentUri in the config file?
       let files = [...(await ctx.autorest.view).InputFileUris];
       for (const fn of files) {
         if (fn == documentUri) {
           // found the document inside this context.
-          // since we're creating a new context, might as well activate it now.
+          this.activeContexts.set(fn, ctx);
           ctx.Track(await this.AcquireTrackedFile(configFile));
-          ctx.Activate();
           return ctx;
         }
       }
@@ -222,23 +197,29 @@ export class AutoRestManager extends TextDocuments {
     // or the configuration that we found didn't contain that file.
 
     // let's look for or create a faux one at that level
-    configFile = ResolveUri(documentUri + "/", "readme.md");
+    //creating this file in a folder under the name of the file, so it's unique to this file
+    configFile = this.GetFakeConfigFileUri(documentUri);
+    //check if file context (the file or files related to this config) is opened in VS Code
     let ctx = this.activeContexts.get(configFile);
     if (ctx) {
-      // we found the previous faux one for this file ctx.Activate();
       ctx.Track(await this.AcquireTrackedFile(configFile));
-      ctx.Activate();
       return ctx;
     }
 
     // we don't have one here - create a faux file
-    let file = await this.AcquireTrackedFile(configFile, "");
+    let file = await this.AcquireTrackedFile(configFile, "#Fake config file \n > see https://aka.ms/autorest \n``` yaml \ninput-file: \n - " + documentUri);
+    //mark it active, as if it was opened in VS Code
     file.IsActive = true;
     ctx = new DocumentContext(this, folder, configFile);
     ctx.autorest.AddConfiguration({ "input-file": documentUri, "azure-arm": true });
     this.activeContexts.set(configFile, ctx);
-    ctx.Activate();
+    this.activeContexts.set(documentUri, ctx);
+    ctx.Track(file);
     return ctx;
+  }
+
+  private GetFakeConfigFileUri(documentUri: string): string {
+    return ResolveUri(documentUri + "/", "readme.md");
   }
 
   private async opened(open: TextDocumentChangeEvent): Promise<void> {
@@ -253,39 +234,88 @@ export class AutoRestManager extends TextDocuments {
         // yes we are. 
         doc.SetContent(open.document.getText());
         doc.IsActive = true;
+        let ctx = await this.GetDocumentContextForDocument(documentUri);
+        this.activeContexts.set(documentUri, ctx);
         return;
       }
 
       // not before this, but now we should
-      let ctx = await this.GetDocumentContextForDocument(documentUri);
+      //let's acquire the tracked file first, then get its document context
       doc = await this.AcquireTrackedFile(documentUri)
       doc.IsActive = true;
+      let ctx = await this.GetDocumentContextForDocument(documentUri);
       ctx.Track(doc);
+      ctx.Activate();
+
     }
   }
 
-  private changed(change: TextDocumentChangeEvent) {
+  private async changed(change: TextDocumentChangeEvent) {
     if (AutoRest.IsConfigurationExtension(change.document.languageId) || AutoRest.IsSwaggerExtension(change.document.languageId)) {
       var documentUri = NormalizeUri(change.document.uri);
       if (!documentUri.startsWith("file://")) {
         return;
       }
-
       let doc = this.trackedFiles.get(documentUri);
       if (doc) {
         // set the document content.
+        doc.IsActive = true;
         doc.SetContent(change.document.getText());
+        let ctx = await this.GetDocumentContextForDocument(documentUri);
+        ctx.Track(doc);
+        ctx.Activate();
       }
     }
   }
 
-  private closed(close: TextDocumentChangeEvent) {
+  private async closed(close: TextDocumentChangeEvent) {
     // if we have this document, we can mark it 
-    let doc = this.trackedFiles.get(NormalizeUri(close.document.uri));
+    let docUri = NormalizeUri(close.document.uri);
+    let doc = this.trackedFiles.get(docUri);
     if (doc) {
-      // we're not tracking this from vscode anymore.
+
+      // config files need some different treatment
+      // if config file is left opened, we do not want to clear diagnostics for referenced files
+      // if config file is closed and no other referenced files are opened, then we should clear diagnostics.
+      let folder = path.dirname(docUri);
+      let ctx = this.activeContexts.get(docUri);
+      let configFile = await AutoRest.DetectConfigurationFile(ctx, folder);
+
+      if (configFile === docUri) {
+        let files = [...(await ctx.autorest.view).InputFileUris];
+        let docfile;
+        for (const fn of files) {
+          docfile = this.trackedFiles.get(NormalizeUri(fn));
+          if (!docfile.IsActive) {
+            this.activeContexts.delete(fn);
+            this.unTrackAndClearDiagnotics(ctx, docfile);
+          }
+        }
+      }
+      // we're not tracking this file from vscode anymore.
       doc.IsActive = false;
+
+      //if the document is not the config file but it has a real config file associated with it
+      if (configFile) {
+        this.activeContexts.delete(docUri);
+        this.unTrackAndClearDiagnotics(ctx, doc);
+      }
+      // if the file is an individual file
+      else {
+        configFile = this.GetFakeConfigFileUri(docUri)
+        ctx = this.activeContexts.get(configFile);
+        this.activeContexts.delete(configFile);
+        this.activeContexts.delete(docUri);
+        this.unTrackAndClearDiagnotics(ctx, doc);
+      }
+
     }
+  }
+
+  private unTrackAndClearDiagnotics(docContext: DocumentContext, file: TrackedFile) {
+    docContext.UnTrack(file);
+    file.ClearDiagnostics();
+    file.FlushDiagnostics(true);
   }
 
   static PadDigits(number: number, digits: number): string {
@@ -369,16 +399,11 @@ export class AutoRestManager extends TextDocuments {
 
     // ask vscode to track 
     this.onDidOpen((p) => this.opened(p));
-    this.onDidChangeContent((p) => this.opened(p));
+    this.onDidChangeContent((p) => this.changed(p));
     this.onDidClose((p) => this.closed(p));
 
     // we also get change notifications of files on disk:
     connection.onDidChangeWatchedFiles((p) => this.changedOnDisk(p));
-
-    // other events we want to handle:
-    // connection.onInitialize((p) => this.initialize(p));
-    connection.onCompletion((p) => this.onCompletion(p));
-    connection.onCompletionResolve((p) => this.onCompletionResolve(p));
 
     // take over configuration file change notifications.
     connection.onDidChangeConfiguration((p) => this.configurationChanged(p));

@@ -65,6 +65,12 @@ export class DocumentContext extends EventEmitter implements IFileSystem {
     }
   }
 
+  public UnTrack(file: TrackedFile) {
+    if (this._fileSubscriptions.has(file)) {
+      this._fileSubscriptions.delete(file);
+    }
+  }
+
   public async Activate(): Promise<void> {
     // tell autorest that it's view needs to be re-created.
     this.Manager.verbose(`Invalidating Autorest view.`);
@@ -73,7 +79,7 @@ export class DocumentContext extends EventEmitter implements IFileSystem {
     // if there is a process() running, kill it. 
     this.cancel();
 
-    // reaquire the config file.
+    // reacquire the config file.
     this.autorest.configFileUri = await AutoRest.DetectConfigurationFile(this, this.RootUri);
 
     // if autorest is about to restart the work, stop that
@@ -113,7 +119,6 @@ export class DocumentContext extends EventEmitter implements IFileSystem {
         process.finish.then(() => {
           return r();
         });
-
         this.cancel = () => {
           // make sure this can't get called twice for the same process call. 
           this.cancel = () => true;
@@ -146,10 +151,6 @@ export class DocumentContext extends EventEmitter implements IFileSystem {
   async ReadFile(fileUri: string): Promise<string> {
     fileUri = NormalizeUri(fileUri);
     let file = (await this.Manager.AcquireTrackedFile(fileUri));
-    if (this._autoRest) {
-      // track this because it looks like we're being asked for the file during process()
-      this.Track(file);
-    }
     return await file.content;
   }
 }

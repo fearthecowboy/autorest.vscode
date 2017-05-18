@@ -68,11 +68,6 @@ async function initialize(params: InitializeParams): Promise<InitializeResult> {
     capabilities: {
       // Tell the client that the server works in FULL text document sync mode
       textDocumentSync: TextDocumentSyncKind.Full,
-
-      // Tell the client that the server support code complete
-      completionProvider: {
-        resolveProvider: true
-      }
     }
   }
 }
