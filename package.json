@@ -80,7 +80,11 @@
           "description": "Traces the communication between VSCode and the AutoRest Language Service"
         }
       }
-    }
+    },
+    "snippets": [{
+      "language": "json",
+      "path": "./snippets/swagger.json"
+    }]
   },
   "scripts": {
     "prepublish": "npm run update-vscode compile",

@@ -1,0 +1,206 @@
+{
+    "Swagger starter": {
+        "prefix": "swagger",
+        "body":[
+            "\"swagger\": \"2.0\",",
+            "\"info\": {",
+                "\t\"title\": \"${1:title}\",",
+                "\t\"description\": \"${2:}\",",
+                "\t\"version\": \"${3:api-version}\",",
+                "\t\"x-ms-code-generation-settings\": {",
+                "\t\t\"name\": \"${4:nameForCodeGeneration}\"",
+                "\t}",
+            "},",
+            "\"host\": \"${5:host}\",",
+            "\"schemes\": [",
+                "\t\"https\"",
+            "],",
+            "\"consumes\": [",
+                "\t\"application/json\"",
+            "],",
+            "\"produces\": [",
+                "\t\"application/json\"",
+            "],",
+            "\"paths\": {",
+            "},",
+            "\"definitions\":{",
+            "},",
+            "\"parameters\":{",
+            "}"
+        ],
+        "description": "OpenAPI specification starter snippet."
+    },
+    "Responses": {
+        "prefix": "responses",
+        "body":[
+            "\"responses\": {",
+            "\t\"${1:statusCode}\": {",
+                "\t\t\"description\": \"${2:}\",",
+                "\t\t\"schema\": {",
+                    "\t\t\t\"$$ref\": \"#/definitions/${3:modelName}\",",
+                "\t\t}",
+            "\t}",
+            "}"
+        ],
+        "description": "Responses snippet."
+    },
+    "Body parameter": {
+        "prefix": "body",
+        "body":[
+            "{",
+            "\t\"name\": \"${1:name}\",",
+            "\t\"in\": \"body\",",
+            "\t\"required\": ${2:false},",
+            "\t\"schema\": {",
+                "\t\t\"$$ref\": \"#/definitions/${3:modelName}\"",
+            "\t}",
+            "}"
+        ],
+        "description": "Body parameter snippet."
+    },
+    "Response status code": {
+        "prefix": "statusCode",
+        "body":[
+            "\"${1:statusCode}\": {",
+                "\t\"description\": \"${2:}\",",
+                "\t\"schema\": {",
+                    "\t\t\"$$ref\": \"#/definitions/${1:modelName}\"",
+                "\t}",
+            "}"
+        ],
+        "description": "Status code snippet."
+    },
+    "Operation": {
+        "prefix": "operation",
+        "body":[
+            "\"${1:httpVerb}\": {",
+                "\t\"tags\": [",
+                "\t\t\"${2:tag}\"",
+                "\t],",
+            "\t\"operationId\": \"${3:operationId}\",",
+            "\t\"description\": \"${4:}\",",
+            "\t\"x-ms-examples\": {",
+            "\t\t\"${5:example name}\": { \"$$ref\": \"${6:path to example}\"}",
+            "\t},",
+            "\t\"parameters\": [",
+            "\t],",
+            "\t\"responses\":{",
+            "\t}",
+            "}"   
+        ],
+        "description": "Operation snippet."
+    },
+    "Enum property": {
+        "prefix": "enumProperty",
+        "body": [
+            "\"${1:propertyName}\": {",
+            "\t\"type\": \"string\",",
+            "\t\"enum\": [",
+            "\t\t\"${2:firstEnumValue}\"",
+            "\t],",
+            "\t\"x-ms-enum\": {",
+            "\t\t\"name\": \"${3:enumName}\",",
+            "\t\t\"modelAsString\": ${4:true}",
+            "\t}",
+            "}"
+        ],
+        "description": "Enum property with x-ms-enum extension."
+    },
+    "x-ms-enum": {
+        "prefix": "x-ms-enum",
+        "body": [
+            "\"x-ms-enum\": {",
+            "\t\"name\": \"${1:enumName}\",",
+            "\t\"modelAsString\": ${2:true}",
+            "}"
+        ],
+        "description": "x-ms-enum extension."
+    },
+    "x-ms-pageable": {
+        "prefix": "x-ms-pageable",
+        "body": [
+            "\"x-ms-pageable\": {",
+            "\t\"nextLinkName\": \"${1:nextLink}\"",
+            "}"
+        ],
+        "description": "x-ms-enum extension."
+    },
+    "x-ms-pageable model definition": {
+        "prefix": "x-ms-pageableModel",
+        "body": [
+            "\"${1:ModelName}\": {",
+            "\t\"properties\": {",
+            "\t\t\"value\": {",
+            "\t\t\t\"type\": \"array\",",
+            "\t\t\t\"items\": {",
+            "\t\t\t\t\"$$ref\":\"#/definitions/${2:ModelName}\"",
+            "\t\t\t}",
+            "\t\t},",
+            "\t\t\"${3:nextLink}\": {",
+            "\t\t\t\"type\": \"string\"",
+            "\t\t}",
+            "\t}",
+            "}"
+        ],
+        "description": "x-ms-enum extension."
+    },
+    "x-ms-long-running-operation": {
+        "prefix": "x-ms-long-running-operation",
+        "body": [
+            "\"x-ms-long-running-operation\": ${1:true}"
+        ],
+        "description": "x-ms-long-running-operation extension."
+    },
+    "Model defintion": {
+        "prefix": "modeldefinition",
+        "body":[
+            "\"${1:ModelName}\": {",
+            "\t\"type\": \"object\",",
+            "\t\"description\": \"${2:}\",",
+            "\t\"properties\": {",
+            "\t\t\"${3:firstProperty}\": {",
+            "\t\t\t\"type\": \"${4:propertyType}\",",
+            "\t\t\t\"description\": \"${5:}\"",
+            "\t\t}",
+            "\t}",
+            "}"            
+        ],
+        "description": "Model definition snippet."
+    },
+    "Parameter defintion": {
+        "prefix": "parameterdefinition",
+        "body":[
+            "\"${1:ParameterName}\": {",
+            "\t\"name\": \"${2:parameterName}\",",
+            "\t\"in\": \"${3:path}\",",
+            "\t\"description\": \"${4:}\",",
+            "\t\"required\": \"${5:true}\",",
+            "\t\"type\": \"string\",",
+            "\t\"x-ms-parameter-location\": \"${6:method}\"",
+            "}"            
+        ],
+        "description": "Parameter definition snippet."
+    },
+    "Property": {
+        "prefix": "property",
+        "body":[
+            "\"${1:propertyName}\": {",
+            "\t\"type\": \"${2:propertyType}\",",
+            "\t\"description\": \"${3:}\"",
+            "}"            
+        ],
+        "description": "Basic property snippet."
+    },
+    "Default response":{
+        "prefix": "defaultResponse",
+        "body":[
+            "\"default\": {",
+            "\t\"description\": \"${2:}\",",
+            "\t\"schema\": {",
+            "\t\t\"$$ref\": \"#/definitions/${3:modelName}\"",
+            "\t}",
+            "}"       
+        ],
+        "description": "Default response snippet."
+    }
+}
