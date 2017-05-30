@@ -20,18 +20,18 @@
     "onLanguage:markdown"
   ],
   "preview": true,
-  "homepage": "https://github.com/azure/autorest/blob/master/README.md",
+  "homepage": "https://github.com/Azure/openapi-lint-extension/blob/master/README.md",
   "icon": "images/logo.png",
   "galleryBanner": {
     "color": "#ACD1EC",
     "theme": "light"
   },
   "bugs": {
-    "url": "https://github.com/Azure/autorest/issues"
+    "url": "https://github.com/Azure/openapi-lint-extension/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/azure/autorest"
+    "url": "https://github.com/Azure/openapi-lint-extension"
   },
   "main": "./client/client",
   "contributes": {
