@@ -211,7 +211,7 @@ export class AutoRestManager extends TextDocuments {
     //mark it active, as if it was opened in VS Code
     file.IsActive = true;
     ctx = new DocumentContext(this, folder, configFile);
-    ctx.autorest.AddConfiguration({ "input-file": documentUri, "azure-arm": true });
+    ctx.autorest.AddConfiguration({ "input-file": documentUri, "azure-validator": true });
     this.activeContexts.set(configFile, ctx);
     this.activeContexts.set(documentUri, ctx);
     ctx.Track(file);
