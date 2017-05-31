@@ -80,7 +80,7 @@ export class DocumentContext extends EventEmitter implements IFileSystem {
     this.cancel();
 
     // reacquire the config file.
-    this.autorest.configFileUri = await AutoRest.DetectConfigurationFile(this, this.RootUri);
+    this.autorest.configFileOrFolderUri = await AutoRest.DetectConfigurationFile(this, this.RootUri);
 
     // if autorest is about to restart the work, stop that
     // so we can push it out a bit more.
