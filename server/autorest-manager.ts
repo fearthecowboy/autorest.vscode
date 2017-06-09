@@ -27,6 +27,9 @@ export const connection: IConnection = (<any>global).connection;
 export const initializeParams: InitializeParams = (<any>global).initializeParams;
 export let settings: Settings = (<any>global).settings;
 
+//TODO: adding URL here temporarily, this should be coming either in the message coming from autorest or the plugin
+const azureValidatorRulesDocUrl = "https://github.com/Azure/azure-rest-api-specs/blob/master/documentation/openapi-authoring-automated-guidelines.md";
+
 export class AutoRestManager extends TextDocuments {
   private trackedFiles = new Map<string, TrackedFile>();
 
@@ -354,6 +357,10 @@ export class AutoRestManager extends TextDocuments {
   }
 
   PushDiagnostic(args: Message, severity: DiagnosticSeverity) {
+    let moreInfo = "";
+    if (args.Plugin === "azure-validator") {
+      moreInfo = "\n More info: " + azureValidatorRulesDocUrl + "#" + args.Key[1] + "-" + args.Key[0] + "\n";
+    }
     if (args.Range) {
       for (const each of args.Range) {
         // get the file reference first
@@ -362,7 +369,7 @@ export class AutoRestManager extends TextDocuments {
           file.PushDiagnostic({
             severity: severity,
             range: Range.create(Position.create(each.start.line - 1, each.start.column), Position.create(each.end.line - 1, each.end.column)),
-            message: args.Text,
+            message: args.Text + moreInfo,
             source: args.Key ? [...args.Key].join("/") : ""
           });
         }
