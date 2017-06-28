@@ -13,13 +13,18 @@ import { TrackedFile } from "./tracked-file"
 import { DocumentContext } from './document-context';
 import { Settings, AutoRestSettings } from './interfaces'
 import * as path from "path"
+import { SourceMap, JsonPath } from "../lib/ref/source-map";
+import { value, stringify, parse, nodes, paths } from "jsonpath";
+import { safeDump } from "js-yaml";
+import { DocumentAnalysis } from "./document-analysis";
 
 import {
   IPCMessageReader, IPCMessageWriter,
   createConnection, IConnection, TextDocumentSyncKind,
   TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
   InitializeParams, InitializeResult, TextDocumentPositionParams, DidChangeConfigurationParams, TextDocumentWillSaveEvent,
-  CompletionItem, CompletionItemKind, Range, Position, DidChangeWatchedFilesParams, TextDocumentChangeEvent
+  CompletionItem, CompletionItemKind, Range, Position, DidChangeWatchedFilesParams, TextDocumentChangeEvent, Hover, Location,
+  CodeLensParams, CodeLens, MarkedString
 } from 'vscode-languageserver';
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
@@ -32,6 +37,13 @@ const azureValidatorRulesDocUrl = "https://github.com/Azure/azure-rest-api-specs
 
 export class AutoRestManager extends TextDocuments {
   private trackedFiles = new Map<string, TrackedFile>();
+
+  public async GetFileContent(documentUri: string): Promise<string | null> {
+    const file = this.trackedFiles.get(documentUri);
+    const content = file && await file.content;
+    if (!content) { console.warn(`file '${documentUri}' not found`); return null; }
+    return content;
+  }
 
   // Map of "path to file/folder" and its document context 
   private activeContexts = new Map<string, DocumentContext>();
@@ -399,10 +411,94 @@ export class AutoRestManager extends TextDocuments {
     }
   }
 
+  /**
+   * Retrieves the fully resolved, fully merged Swagger definition representing the currently inspected service.
+   */
+  public GetFullyResolvedAndMergedDefinitionOf(documentUri: string): { openapiDefinition: any, openapiDefinitionMap: sourceMap.RawSourceMap } {
+    const context = this.activeContexts.get(documentUri);
+
+    if (!context) {
+      console.warn("no context found", documentUri, [...this.activeContexts.keys()]);
+      return null;
+    }
+
+    const result = context.fullyResolvedAndMergedDefinition;
+
+    if (!result.openapiDefinition || !result.openapiDefinitionMap) {
+      console.log("waiting for AutoRest to provide data");
+      return null;
+    }
+
+    return result;
+  }
+
+  private * onHoverRef(docAnalysis: DocumentAnalysis, position: Position): Iterable<MarkedString> {
+    const refValueJsonPath = docAnalysis.GetJsonPathFromJsonReferenceAt(position);
+    if (!refValueJsonPath) { console.log("found nothing that looks like a JSON reference"); return null; }
+
+    for (const location of docAnalysis.GetDefinitionLocations(refValueJsonPath)) {
+      yield {
+        language: "yaml",
+        value: safeDump(location.value)
+      };
+    }
+  }
+
+  private * onHoverJsonPath(docAnalysis: DocumentAnalysis, position: Position): Iterable<MarkedString> {
+    const potentialQuery: string = docAnalysis.GetJsonQueryAt(position);
+    if (!potentialQuery) { console.log("found nothing that looks like a JSON path"); return null; }
+
+    const queryNodes = [...docAnalysis.GetDefinitionLocations(potentialQuery)];
+    yield {
+      language: "plaintext",
+      value: `${queryNodes.length} matches\n${queryNodes.map(node => node.jsonPath).join("\n")}`
+    };
+  }
+
+  private async onHover(position: TextDocumentPositionParams): Promise<Hover | null> {
+    const docAnalysis = await DocumentAnalysis.Create(this, position.textDocument.uri);
+    if (!docAnalysis) {
+      return null;
+    }
+
+    return <Hover>{
+      contents: [
+        ...this.onHoverRef(docAnalysis, position.position),
+        ...this.onHoverJsonPath(docAnalysis, position.position)
+      ]
+    };
+  }
+
+  private onDefinitionRef(docAnalysis: DocumentAnalysis, position: Position): Iterable<Location> {
+    const refValueJsonPath = docAnalysis.GetJsonPathFromJsonReferenceAt(position);
+    if (!refValueJsonPath) { console.log("found nothing that looks like a JSON reference"); return []; }
+
+    return docAnalysis.GetDocumentLocations(refValueJsonPath);
+  }
+
+  private onDefinitionJsonPath(docAnalysis: DocumentAnalysis, position: Position): Iterable<Location> {
+    const potentialQuery: string = docAnalysis.GetJsonQueryAt(position);
+    if (!potentialQuery) { console.log("found nothing that looks like a JSON path"); return []; }
+
+    return docAnalysis.GetDocumentLocations(potentialQuery);
+  }
+
+  private async onDefinition(position: TextDocumentPositionParams): Promise<Location[] | null> {
+    const docAnalysis = await DocumentAnalysis.Create(this, position.textDocument.uri);
+    if (!docAnalysis) {
+      return null;
+    }
+
+    return [
+      ...this.onDefinitionRef(docAnalysis, position.position),
+      ...this.onDefinitionJsonPath(docAnalysis, position.position)
+    ];
+  }
+
   constructor(private connection: IConnection) {
     super();
     this.debug("setting up AutoRestManager.");
-    this.SetRootUri(initializeParams.rootUri);
+    this.SetRootUri(NormalizeUri(initializeParams.rootUri));
 
     // ask vscode to track 
     this.onDidOpen((p) => this.opened(p));
@@ -414,6 +510,10 @@ export class AutoRestManager extends TextDocuments {
 
     // take over configuration file change notifications.
     connection.onDidChangeConfiguration((p) => this.configurationChanged(p));
+
+    connection.onHover((position, cancel) => this.onHover(position));
+
+    connection.onDefinition((position, cancel) => this.onDefinition(position));
 
     // on save
     this.onDidSave((p) => this.onSaving(p));

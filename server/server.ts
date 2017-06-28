@@ -12,13 +12,13 @@ import {
   createConnection, IConnection, TextDocumentSyncKind,
   TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity, DidChangeConfigurationParams,
   InitializeParams, InitializeResult, TextDocumentPositionParams,
-  CompletionItem, CompletionItemKind, Range, Position
+  CompletionItem, CompletionItemKind, Range, Position, CodeLensOptions
 } from 'vscode-languageserver';
 import { Enumerable as IEnumerable, From } from 'linq-es2015';
 import { Installer } from "../node_modules/autorest/installer";
-import { Asset, Github, Release } from '../node_modules/autorest/github'
-import { Settings, AutoRestSettings } from './interfaces'
-import * as semver from 'semver'
+import { Asset, Github, Release } from '../node_modules/autorest/github';
+import { Settings, AutoRestSettings } from './interfaces';
+import * as semver from 'semver';
 
 export const connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
 (<any>global).connection = connection;
@@ -66,6 +66,12 @@ async function initialize(params: InitializeParams): Promise<InitializeResult> {
 
   return {
     capabilities: {
+      // TODO: provide code lens handlers to preview generated code and such!
+      // codeLensProvider: <CodeLensOptions>{
+      //   resolveProvider: false
+      // },
+      definitionProvider: true,
+      hoverProvider: true,
       // Tell the client that the server works in FULL text document sync mode
       textDocumentSync: TextDocumentSyncKind.Full,
     }
