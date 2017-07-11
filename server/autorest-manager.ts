@@ -371,7 +371,7 @@ export class AutoRestManager extends TextDocuments {
   PushDiagnostic(args: Message, severity: DiagnosticSeverity) {
     let moreInfo = "";
     if (args.Plugin === "azure-validator") {
-      moreInfo = "\n More info: " + azureValidatorRulesDocUrl + "#" + args.Key[1] + "-" + args.Key[0] + "\n";
+      moreInfo = "\n More info: " + azureValidatorRulesDocUrl + "#" + args.Key[1].toLowerCase() + "-" + args.Key[0].toLowerCase() + "\n";
     }
     if (args.Range) {
       for (const each of args.Range) {
