@@ -24,7 +24,7 @@ This extension currently uses AutoRest to surface validation errors in OpenAPI s
 
 After installing the extension, opening an OpenAPI spec, will kick off AutoRest validation and report any errors/warning in the "Problems" window of Visual Studio Code, squiggles will also show up for errors/warnings and hovering over the item will provide more information. 
 
-<img align="center" src="./images/VScode-extension.PNG">
+![alt text](https://github.com/Azure/openapi-lint-extension/blob/master/images/VScode-extension.PNG)
 
 ### Editing OpenAPI specs - Templates
 To assist in creating and editing OpenAPI specs, the extension provides a set of templates/snippets. 
