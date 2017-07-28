@@ -33,7 +33,7 @@ export const initializeParams: InitializeParams = (<any>global).initializeParams
 export let settings: Settings = (<any>global).settings;
 
 //TODO: adding URL here temporarily, this should be coming either in the message coming from autorest or the plugin
-const azureValidatorRulesDocUrl = "https://github.com/Azure/azure-rest-api-specs/blob/master/documentation/openapi-authoring-automated-guidelines.md";
+const azureValidatorRulesDocUrl = "https://github.com/Azure/azure-rest-api-specs/blob/current/documentation/openapi-authoring-automated-guidelines.md";
 
 export class AutoRestManager extends TextDocuments {
   private trackedFiles = new Map<string, TrackedFile>();
