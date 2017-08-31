@@ -93,6 +93,7 @@ export class DocumentContext extends EventEmitter implements IFileSystem {
 
     // reacquire the config file.
     this.autorest.configFileOrFolderUri = await AutoRest.DetectConfigurationFile(this, this.RootUri);
+    this.autorest.AddConfiguration({ "azure-validator": true });
 
     // if autorest is about to restart the work, stop that
     // so we can push it out a bit more.
