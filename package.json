@@ -1,0 +1,123 @@
+{
+  "name": "autorest",
+  "displayName": "AutoRest",
+  "description": "AutoRest/Swagger Language Service",
+  "author": "Microsoft Corporation",
+  "license": "MIT",
+  "version": "1.99.0",
+  "publisher": "ms-vscode",
+  "engines": {
+    "vscode": "^1.16.0"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.42",
+    "@types/node": "^6.0.88",
+    "@types/js-yaml": "^3.5.31",
+    "@types/jsonpath": "^0.1.29",
+    "@types/pify": "0.0.28",
+    "@types/source-map": "^0.5.0",
+    "@types/vinyl": "^2.0.0",
+    "@types/vinyl-fs": "^2.4.2",
+    "typescript": "2.5.3",
+    "yaml-ast-parser": "https://github.com/olydis/yaml-ast-parser/releases/download/0.0.34/yaml-ast-parser-0.0.34.tgz"
+  },
+  "dependencies": {
+    "vscode": "^1.1.5",
+    "vscode-languageclient": "^3.4.2",
+    "vscode-languageserver": "^3.4.2",
+    "@microsoft.azure/eventing": "^1.0.16",
+    "@microsoft.azure/async-io": "^1.0.21",
+    "autorest": "C:/work/github/autorest/autorest/src/autorest/autorest-2.0.5.tgz",
+    "file-url": "^2.0.2",
+    "get-uri": "^2.0.0",
+    "js-yaml": "^3.8.4",
+    "jsonpath": "^0.2.11",
+    "linq-es2015": "^2.4.13",
+    "pify": "^2.3.0",
+    "semver": "^5.3.0",
+    "source-map": "^0.5.6",
+    "strip-bom": "^3.0.0",
+    "urijs": "^1.18.9"
+  },
+  "categories": [
+    "Linters",
+    "Languages",
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:json",
+    "onLanguage:yaml",
+    "onLanguage:markdown"
+  ],
+  "preview": true,
+  "homepage": "https://github.com/Azure/openapi-lint-extension/blob/master/README.md",
+  "icon": "images/logo.png",
+  "galleryBanner": {
+    "color": "#ACD1EC",
+    "theme": "light"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/openapi-lint-extension/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Azure/openapi-lint-extension"
+  },
+  "main": "./dist/client/client",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "AutoRest Configuration",
+      "properties": {
+        "autorest.minimumAutoRestVersion": {
+          "type": "string",
+          "default": "latest-installed",
+          "description": "forces the minimum version of the autorest-core to be installed."
+        },
+        "autorest.maxNumberOfProblems": {
+          "type": "number",
+          "default": 100,
+          "description": "Controls the maximum number of problems produced by the server."
+        },
+        "autorest.debug": {
+          "type": "boolean",
+          "default": false,
+          "description": "Shows AutoRest DEBUG messages in the console."
+        },
+        "autorest.verbose": {
+          "type": "boolean",
+          "default": false,
+          "description": "Shows AutoRest VERBOSE messages in the console."
+        },
+        "autorest.information": {
+          "type": "boolean",
+          "default": true,
+          "description": "Shows AutoRest INFORMATION messages in the console."
+        },
+        "autorest.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VSCode and the AutoRest Language Service"
+        }
+      }
+    }
+  },
+  "snippets": [
+    {
+      "language": "json",
+      "path": "./snippets/swagger.json"
+    }
+  ],
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -p ./",
+    "watch": "tsc -w -p ./",
+    "update-vscode": "node ./node_modules/vscode/bin/install",
+    "postinstall": "node ./node_modules/vscode/bin/install"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    "alwaysStrict": true,
+    "forceConsistentCasingInFileNames": false,
+    "noEmitOnError": true,
+    "noImplicitAny": false,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "sourceMap": true,
+    "strictNullChecks": false,
+    "stripInternal": true,
+    "target": "es2017",
+    "module": "commonjs",
+    "types": [
+      "node"
+    ],
+    "moduleResolution": "node",
+    "lib": [
+      "es2016"
+    ],
+    "outDir": "./dist",
+    "newLine": "LF",
+    "experimentalDecorators": true
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
