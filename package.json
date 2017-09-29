@@ -27,7 +27,7 @@
     "vscode-languageserver": "^3.4.2",
     "@microsoft.azure/eventing": "^1.0.16",
     "@microsoft.azure/async-io": "^1.0.21",
-    "autorest": "C:/work/github/autorest/autorest/src/autorest/autorest-2.0.5.tgz",
+    "autorest": "^2.0.4151",
     "file-url": "^2.0.2",
     "get-uri": "^2.0.0",
     "js-yaml": "^3.8.4",
