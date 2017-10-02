@@ -10,6 +10,7 @@ import { workspace, ExtensionContext, WorkspaceConfiguration } from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient';
 import { AutoRestSettings } from "../lib/interfaces";
 import StatusBar from '../client/statusbar';
+import SplitPane from '../client/splitpane';
 
 export function activate(context: ExtensionContext) {
 
@@ -48,7 +49,10 @@ export function activate(context: ExtensionContext) {
     },
   }
   // Create the language client and start the client.
-  let disposable = new LanguageClient('autorest', 'Autorest Language Service', serverOptions, clientOptions).start();
+  let client = new LanguageClient('autorest', 'Autorest Language Service', serverOptions, clientOptions);
+  let disposable = client.start();
+
+  SplitPane.setup(client);
 
   // Push the disposable to the context's subscriptions so that the 
   // client can be deactivated on extension deactivation
