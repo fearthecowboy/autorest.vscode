@@ -534,8 +534,8 @@ export class OpenApiDocumentManager extends TextDocuments {
         let documentUri = FileUrl(args.inputFile)
         documentUri = NormalizeUri(documentUri);
         let ctx = await this.GetDocumentContextForDocument(documentUri);
-        let res = ctx.getGeneratedCode();
-        return JSON.stringify(res);
+        const res = await ctx.generateCode(args.additionalConfig);
+        return res;
     }
 
     constructor(private connection: IConnection) {

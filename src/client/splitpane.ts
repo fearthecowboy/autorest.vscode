@@ -51,47 +51,44 @@ module SplitPane {
     client.sendRequest('autorest.generateCode', autorestArgs).then(result => displayGeneratedCode(<string>result, args));
   }
 
-  function writeFilesToDisk(resultObj: any) {
+  async function writeFilesToDisk(resultObj: any) {
     let opDirPath: string = path.normalize(resultObj['outputFolder']);
     if (opDirPath.startsWith(opDirPath)) {
       opDirPath = opDirPath.replace('file:' + path.sep, '');
     }
     deleteFolderRecursive(opDirPath);
 
-    resultObj['generatedFiles'].forEach(fileObj => {
-      let fileName = path.normalize(fileObj['fileName']);
-      if (fileName.startsWith('file:')) {
-        fileName = fileName.replace('file:' + path.sep, '');
+    const generatedFiles = resultObj['generatedFiles'];
+    await Object.keys(generatedFiles).forEach(async key => {
+      let filePath = path.normalize(key);
+      if (filePath.startsWith('file:')) {
+        filePath = filePath.replace('file:' + path.sep, '');
       }
-      let dirName: string = path.dirname(fileName);
+      let dirName: string = path.dirname(filePath);
       while (!fs.existsSync(dirName)) {
-        fs.mkdirSync(dirName);
+        await fs.mkdir(dirName);
         dirName = path.dirname(dirName);
       }
-      fs.writeFile(fileName, fileObj['content'], { flag: 'w+' }, err => {
-        if (err) {
-          console.error('Could not write to file: ' + fileName);
-        }
-      });
+      await writeToDisk(filePath, generatedFiles[key]);
     });
     window.showInformationMessage('Code generated under directory ' + opDirPath);
   }
 
-  function deleteFolderRecursive(dirPath: string) {
-    if (fs.existsSync(dirPath)) {
-      fs.readdirSync(dirPath).forEach(function (file, index) {
+  async function deleteFolderRecursive(dirPath: string) {
+    if (await fs.exists(dirPath)) {
+      await fs.readdir(dirPath).forEach(async function (file, index) {
         var curPath = path.join(dirPath, file);
-        if (fs.lstatSync(curPath).isDirectory()) { // recurse
+        if (await fs.lstat(curPath).isDirectory()) { // recurse
           deleteFolderRecursive(curPath);
         } else { // delete file
-          fs.unlinkSync(curPath);
+          await fs.unlink(curPath);
         }
       });
-      fs.rmdirSync(dirPath);
+      await fs.rmdir(dirPath);
     }
   };
 
-  function writeContentToSingleFile(resultObj: any, args?: Array<string>) {
+  async function writeContentToMarkdown(resultObj: any, args?: Array<string>) {
     // dump generated code received into a temp file and show that file on the split pane!!!!
     // this fname is going to basically be the autorest output
     let opfname = 'output.md';
@@ -99,40 +96,44 @@ module SplitPane {
       opfname = args.join('.') + '.' + opfname;
     }
 
-    const fname: string = path.normalize(path.join(os.tmpdir(), opfname));
+    const filePath: string = path.normalize(path.join(os.tmpdir(), opfname));
     let content: string = '## Generated Code\n';
+    const generatedFiles = resultObj['generatedFiles'];
 
-    resultObj['generatedFiles'].forEach(fileObj => {
+    Object.keys(generatedFiles).forEach(filePath => {
       content += '### File Name:'
-      content += '\n\n[' + path.basename(fileObj['fileName']) + '](' + fileObj['fileName'] + ')' + '\n\n';
+      content += '\n\n[' + path.basename(filePath) + '](' + filePath + ')' + '\n\n';
       content += '### File Content:';
-      content += '\n```\n' + fileObj['content'] + '\n```\n';
+      content += '\n```\n' + generatedFiles[filePath] + '\n```\n';
     });
-
-    fs.writeFile(fname, content, { flag: 'w+' }, (err) => {
-      if (err) {
-        window.showErrorMessage('Unable to write to local temp file: ' + fname);
-        return;
-      }
-      const openPath: Uri = Uri.file(fname);
-
-      // By default dump everything in column 2
-      workspace.openTextDocument(openPath).then(doc => {
-        window.showTextDocument(doc, ViewColumn.Two);
-        commands.executeCommand('markdown.showPreview', openPath);
-      });
+    await writeToDisk(filePath, content);
+    const openPath: Uri = Uri.file(filePath);
+    // By default dump everything in column 2
+    workspace.openTextDocument(openPath).then(doc => {
+      window.showTextDocument(doc, ViewColumn.Two);
+      commands.executeCommand('markdown.showPreview', openPath);
     });
   }
 
+  async function writeToDisk(filePath: string, content: string): Promise<void> {
+    return new Promise<void>((r, _j) => {
+      fs.writeFile(filePath, content, { flag: 'w+' }, (err) => {
+        if (err) {
+          window.showErrorMessage('Unable to write to local temp file: ' + filePath);
+        }
+        r();
+      })
+    });
+  }
 
-  function displayGeneratedCode(result: string, args?: Array<string>) {
+  async function displayGeneratedCode(result: string, args?: Array<string>) {
     if (!result) {
       window.showErrorMessage('Failed to generate code for given file. Please check AutoRest server log for more information.');
       return;
     }
     const resultObj = JSON.parse(result);
-    writeFilesToDisk(resultObj);
-    writeContentToSingleFile(resultObj, args);
+    await writeFilesToDisk(resultObj);
+    await writeContentToMarkdown(resultObj, args);
   }
 }
 var splitPane: IPlugin = SplitPane;
