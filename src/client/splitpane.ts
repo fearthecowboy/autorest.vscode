@@ -35,7 +35,7 @@ module SplitPane {
     return null;
   }
 
-  function generateCode(client: LanguageClient, args?: Array<string>) {
+  function generateCode(client: LanguageClient, args: Array<string>) {
     const currFile: string = window.activeTextEditor.document.fileName;
     if (!(currFile.endsWith('.json') || currFile.endsWith('.md'))) {
       window.showErrorMessage(currFile + ' is not a valid OpenAPI specification file format.');
@@ -88,7 +88,7 @@ module SplitPane {
     }
   };
 
-  async function writeContentToMarkdown(resultObj: any, args?: Array<string>) {
+  async function writeContentToMarkdown(resultObj: any, args: Array<string>) {
     // dump generated code received into a temp file and show that file on the split pane!!!!
     // this fname is going to basically be the autorest output
     let opfname = 'output.md';
@@ -126,7 +126,7 @@ module SplitPane {
     });
   }
 
-  async function displayGeneratedCode(result: string, args?: Array<string>) {
+  async function displayGeneratedCode(result: string, args: Array<string>) {
     if (!result) {
       window.showErrorMessage('Failed to generate code for given file. Please check AutoRest server log for more information.');
       return;

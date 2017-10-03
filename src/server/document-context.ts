@@ -21,7 +21,6 @@ import fs = require('fs');
  */
 export class DocumentContext extends EventEmitter implements IFileSystem {
   public autorest: Promise<AutoRest>;
-  public codeGen: Promise<AutoRest>;
   private _readyToRun: NodeJS.Timer | null = null;
   private _fileSubscriptions = new Map<TrackedFile, () => void>();
   public cancel: () => boolean = () => true;
@@ -47,7 +46,7 @@ export class DocumentContext extends EventEmitter implements IFileSystem {
     codeGeneratorInstance.AddConfiguration({ "verbose": true });
     codeGeneratorInstance.AddConfiguration(additionalConfig);
 
-    const opDirName: string = (this.configurationFile && fs.existsSync(this.configurationFile) && fs.statSync(this.configurationFile).isFile()) ?
+    const opDirName: string = (this.configurationFile && fs.existsSync(this.configurationFile)) ?
       path.basename(path.dirname(this.configurationFile)) : 'out';
 
     // where to output the generated code (clear the directory before generating code)
