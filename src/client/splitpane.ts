@@ -26,6 +26,15 @@ module SplitPane {
     "extension.autoGenCode.java.azure": ["java", "azure-arm"]
   };
 
+  const markdownSyntaxHighlightMap = {
+    ".cs": "csharp",
+    ".rb": "ruby",
+    ".js": "js",
+    ".go": "go",
+    ".java": "java",
+    ".py": "python"
+  };
+
   export function setup(client: LanguageClient): IPluginResult {
     console.info('Registering command to launch split pane for autogened code');
     // for each command, register handlers that can send requests to server
@@ -102,7 +111,7 @@ module SplitPane {
 
     Object.keys(generatedFiles).forEach(filePath => {
       content += '### [' + path.basename(filePath) + '](' + filePath + ')' + '\n\n';
-      content += '\n```\n' + generatedFiles[filePath] + '\n```\n';
+      content += '\n```' + markdownSyntaxHighlightMap[path.extname(filePath)] + ' \n' + generatedFiles[filePath] + '\n```\n';
     });
     await writeToDisk(filePath, content);
     const openPath: Uri = Uri.file(filePath);
