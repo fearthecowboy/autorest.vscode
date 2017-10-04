@@ -39,8 +39,9 @@ export class DocumentContext extends EventEmitter implements IFileSystem {
   }
 
   public async generateCode(additionalConfig: any): Promise<string> {
+    this.Manager.debug('Creating AutoRest instance to generate code');
     const codeGeneratorInstance = await create(this, this.configurationFile);
-    let result = {};
+    let result: object = {};
 
     codeGeneratorInstance.AddConfiguration({ "debug": true });
     codeGeneratorInstance.AddConfiguration({ "verbose": true });
@@ -62,6 +63,7 @@ export class DocumentContext extends EventEmitter implements IFileSystem {
     return new Promise<string>((r, _j) => {
       codeGeneratorInstance.Process().finish.then(() => {
         result['generatedFiles'] = genFiles;
+        this.Manager.debug(`AutoRest successfully generated the code. Result object:\n ${JSON.stringify(result)}`);
         return r(JSON.stringify(result));
       });
     });

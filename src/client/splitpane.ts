@@ -41,7 +41,7 @@ module SplitPane {
       window.showErrorMessage(currFile + ' is not a valid OpenAPI specification file format.');
       return;
     }
-    let autorestArgs = {};
+    let autorestArgs: object = {};
     autorestArgs['inputFile'] = window.activeTextEditor.document.fileName;
     autorestArgs['additionalConfig'] = {};
     if (args) {
@@ -101,9 +101,7 @@ module SplitPane {
     const generatedFiles = resultObj['generatedFiles'];
 
     Object.keys(generatedFiles).forEach(filePath => {
-      content += '### File Name:'
-      content += '\n\n[' + path.basename(filePath) + '](' + filePath + ')' + '\n\n';
-      content += '### File Content:';
+      content += '### [' + path.basename(filePath) + '](' + filePath + ')' + '\n\n';
       content += '\n```\n' + generatedFiles[filePath] + '\n```\n';
     });
     await writeToDisk(filePath, content);

@@ -535,7 +535,9 @@ export class OpenApiDocumentManager extends TextDocuments {
   private async autoGenerateCode(args: any): Promise<string> {
     let documentUri = FileUrl(args.inputFile)
     documentUri = NormalizeUri(documentUri);
+    this.debug(`Obtaining document context object for ${documentUri}`);
     let ctx = await this.GetDocumentContextForDocument(documentUri);
+    this.debug(`Context obtained, generating code for it`);
     const res = await ctx.generateCode(args.additionalConfig);
     return res;
   }
