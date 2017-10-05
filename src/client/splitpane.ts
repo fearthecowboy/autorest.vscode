@@ -5,9 +5,16 @@
 import { workspace, Disposable, window, commands, Uri, ViewColumn, TextDocument } from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
 import { IPlugin, IPluginResult } from '../client/plugin'
+import { AutoRestCodeGenerationResult } from '../lib/interfaces'
 const fs = require('fs'),
   path = require('path'),
   os = require('os');
+
+
+interface AutorestArgs {
+  inputFile: string;
+  additionalConfig: object;
+}
 
 module SplitPane {
 
@@ -50,12 +57,15 @@ module SplitPane {
       window.showErrorMessage(currFile + ' is not a valid OpenAPI specification file format.');
       return;
     }
-    let autorestArgs: object = {};
-    autorestArgs['inputFile'] = window.activeTextEditor.document.fileName;
-    autorestArgs['additionalConfig'] = {};
+    let additionalConfig = {};
     if (args) {
-      args.forEach(element => autorestArgs['additionalConfig'][element] = true);
+      args.forEach(element => additionalConfig[element] = true);
     }
+
+    const autorestArgs: AutorestArgs = {
+      inputFile: window.activeTextEditor.document.fileName,
+      additionalConfig: additionalConfig
+    };
 
     client.sendRequest('autorest.generateCode', autorestArgs).then(result => displayGeneratedCode(<string>result, args));
   }
@@ -138,7 +148,7 @@ module SplitPane {
       window.showErrorMessage('Failed to generate code for given file. Please check AutoRest server log for more information.');
       return;
     }
-    const resultObj = JSON.parse(result);
+    const resultObj = JSON.parse(result) as AutoRestCodeGenerationResult;
     await writeFilesToDisk(resultObj);
     await writeContentToMarkdown(resultObj, args);
   }

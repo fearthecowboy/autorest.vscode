@@ -18,3 +18,8 @@ export interface AutoRestSettings {
   runtimeId: string;
   minimumAutoRestVersion: string;
 }
+
+export interface AutoRestCodeGenerationResult {
+  outputFolder: string;
+  generatedFiles: Map<string, string>;
+}

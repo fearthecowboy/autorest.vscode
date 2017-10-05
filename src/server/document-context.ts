@@ -13,6 +13,7 @@ import { isDirectory, readdir } from '@microsoft.azure/async-io';
 import * as path from 'path';
 import os = require('os');
 import fs = require('fs');
+import { AutoRestCodeGenerationResult } from '../lib/interfaces'
 
 /**
  * Represents a "configuration/root" for a folder (or single document)
@@ -41,7 +42,6 @@ export class DocumentContext extends EventEmitter implements IFileSystem {
   public async generateCode(additionalConfig: any): Promise<string> {
     this.Manager.debug('Creating AutoRest instance to generate code');
     const codeGeneratorInstance = await create(this, this.configurationFile);
-    let result: object = {};
 
     codeGeneratorInstance.AddConfiguration({ "debug": true });
     codeGeneratorInstance.AddConfiguration({ "verbose": true });
@@ -53,16 +53,19 @@ export class DocumentContext extends EventEmitter implements IFileSystem {
     // where to output the generated code (clear the directory before generating code)
     const opPath: string = path.join(os.tmpdir(), opDirName);
     codeGeneratorInstance.AddConfiguration({ "output-folder": opPath });
-    result['outputFolder'] = opPath;
 
     this.Manager.listenForResults(codeGeneratorInstance);
-    let genFiles = {};
+    let genFiles = new Map<string, string>();
     codeGeneratorInstance.GeneratedFile.Subscribe((_instance, artifact) => {
       genFiles[artifact.uri] = artifact.content;
     });
     return new Promise<string>((r, _j) => {
       codeGeneratorInstance.Process().finish.then(() => {
-        result['generatedFiles'] = genFiles;
+        const result: AutoRestCodeGenerationResult = {
+          outputFolder: opPath,
+          generatedFiles: genFiles
+        };
+
         this.Manager.debug(`AutoRest successfully generated the code. Result object:\n ${JSON.stringify(result)}`);
         return r(JSON.stringify(result));
       });
