@@ -55,7 +55,7 @@ export class DocumentContext extends EventEmitter implements IFileSystem {
     codeGeneratorInstance.AddConfiguration({ "output-folder": opPath });
 
     this.Manager.listenForResults(codeGeneratorInstance);
-    let genFiles = new Map<string, string>();
+    let genFiles = {};
     codeGeneratorInstance.GeneratedFile.Subscribe((_instance, artifact) => {
       genFiles[artifact.uri] = artifact.content;
     });

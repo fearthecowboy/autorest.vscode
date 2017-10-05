@@ -5,16 +5,10 @@
 import { workspace, Disposable, window, commands, Uri, ViewColumn, TextDocument } from 'vscode';
 import { LanguageClient } from 'vscode-languageclient';
 import { IPlugin, IPluginResult } from '../client/plugin'
-import { AutoRestCodeGenerationResult } from '../lib/interfaces'
+import { AutoRestCodeGenerationResult, AutoRestCodeGenerationArgs } from '../lib/interfaces'
 const fs = require('fs'),
   path = require('path'),
   os = require('os');
-
-
-interface AutorestArgs {
-  inputFile: string;
-  additionalConfig: object;
-}
 
 module SplitPane {
 
@@ -62,7 +56,7 @@ module SplitPane {
       args.forEach(element => additionalConfig[element] = true);
     }
 
-    const autorestArgs: AutorestArgs = {
+    const autorestArgs: AutoRestCodeGenerationArgs = {
       inputFile: window.activeTextEditor.document.fileName,
       additionalConfig: additionalConfig
     };
@@ -70,7 +64,7 @@ module SplitPane {
     client.sendRequest('autorest.generateCode', autorestArgs).then(result => displayGeneratedCode(<string>result, args));
   }
 
-  async function writeFilesToDisk(resultObj: any) {
+  async function writeFilesToDisk(resultObj: AutoRestCodeGenerationResult) {
     let opDirPath: string = path.normalize(resultObj['outputFolder']);
     if (opDirPath.startsWith(opDirPath)) {
       opDirPath = opDirPath.replace('file:' + path.sep, '');
@@ -107,7 +101,7 @@ module SplitPane {
     }
   };
 
-  async function writeContentToMarkdown(resultObj: any, args: Array<string>) {
+  async function writeContentToMarkdown(resultObj: AutoRestCodeGenerationResult, args: Array<string>) {
     // dump generated code received into a temp file and show that file on the split pane!!!!
     // this fname is going to basically be the autorest output
     let opfname = 'output.md';

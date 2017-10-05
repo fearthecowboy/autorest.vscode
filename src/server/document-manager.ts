@@ -23,6 +23,8 @@ import {
 } from 'vscode-languageserver';
 
 import { initialize as initAutoRestCore } from "autorest";
+import { AutoRestCodeGenerationArgs } from '../lib/interfaces';
+
 const FileUrl = require('file-url');
 
 //TODO: adding URL here temporarily, this should be coming either in the message coming from autorest or the plugin
@@ -532,7 +534,7 @@ export class OpenApiDocumentManager extends TextDocuments {
     ];
   }
 
-  private async autoGenerateCode(args: any): Promise<string> {
+  private async autoGenerateCode(args: AutoRestCodeGenerationArgs): Promise<string> {
     let documentUri = FileUrl(args.inputFile)
     documentUri = NormalizeUri(documentUri);
     this.debug(`Obtaining document context object for ${documentUri}`);
