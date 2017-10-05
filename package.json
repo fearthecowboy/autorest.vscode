@@ -47,7 +47,18 @@
   "activationEvents": [
     "onLanguage:json",
     "onLanguage:yaml",
-    "onLanguage:markdown"
+    "onLanguage:markdown",
+    "onCommand:extension.autoGenCode.csharp",
+    "onCommand:extension.autoGenCode.nodejs",
+    "onCommand:extension.autoGenCode.ruby",
+    "onCommand:extension.autoGenCode.python",
+    "onCommand:extension.autoGenCode.go",
+    "onCommand:extension.autoGenCode.java",
+    "onCommand:extension.autoGenCode.csharp.azure",
+    "onCommand:extension.autoGenCode.ruby.azure",
+    "onCommand:extension.autoGenCode.nodejs.azure",
+    "onCommand:extension.autoGenCode.python.azure",
+    "onCommand:extension.autoGenCode.java.azure"
   ],
   "preview": true,
   "homepage": "https://github.com/Azure/openapi-lint-extension/blob/master/README.md",
@@ -105,7 +116,64 @@
           "description": "Traces the communication between VSCode and the AutoRest Language Service"
         }
       }
-    }
+    },
+    "commands": [
+      {
+        "command": "extension.autoGenCode.csharp",
+        "title": "Generate CSharp code",
+        "category": "AutoRest"
+      },
+      {
+        "command": "extension.autoGenCode.nodejs",
+        "title": "Generate Nodejs code",
+        "category": "AutoRest"
+      },
+      {
+        "command": "extension.autoGenCode.python",
+        "title": "Generate Python code",
+        "category": "AutoRest"
+      },
+      {
+        "command": "extension.autoGenCode.go",
+        "title": "Generate Go code",
+        "category": "AutoRest"
+      },
+      {
+        "command": "extension.autoGenCode.java",
+        "title": "Generate Java code",
+        "category": "AutoRest"
+      },
+      {
+        "command": "extension.autoGenCode.ruby",
+        "title": "Generate Ruby code",
+        "category": "AutoRest"
+      },
+      {
+        "command": "extension.autoGenCode.csharp.azure",
+        "title": "Generate CSharp Azure code",
+        "category": "AutoRest:Azure"
+      },
+      {
+        "command": "extension.autoGenCode.nodejs.azure",
+        "title": "Generate Nodejs Azure code",
+        "category": "AutoRest:Azure"
+      },
+      {
+        "command": "extension.autoGenCode.python.azure",
+        "title": "Generate Python Azure code",
+        "category": "AutoRest:Azure"
+      },
+      {
+        "command": "extension.autoGenCode.ruby.azure",
+        "title": "Generate Ruby Azure code",
+        "category": "AutoRest:Azure"
+      },
+      {
+        "command": "extension.autoGenCode.java.azure",
+        "title": "Generate Java Azure code",
+        "category": "AutoRest:Azure"
+      }
+    ]
   },
   "snippets": [
     {

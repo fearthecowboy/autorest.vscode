@@ -23,6 +23,9 @@ import {
 } from 'vscode-languageserver';
 
 import { initialize as initAutoRestCore } from "autorest";
+import { AutoRestCodeGenerationArgs } from '../lib/interfaces';
+
+const FileUrl = require('file-url');
 
 //TODO: adding URL here temporarily, this should be coming either in the message coming from autorest or the plugin
 const azureValidatorRulesDocUrl = "https://github.com/Azure/azure-rest-api-specs/blob/current/documentation/openapi-authoring-automated-guidelines.md";
@@ -531,6 +534,16 @@ export class OpenApiDocumentManager extends TextDocuments {
     ];
   }
 
+  private async autoGenerateCode(args: AutoRestCodeGenerationArgs): Promise<string> {
+    let documentUri = FileUrl(args.inputFile)
+    documentUri = NormalizeUri(documentUri);
+    this.debug(`Obtaining document context object for ${documentUri}`);
+    let ctx = await this.GetDocumentContextForDocument(documentUri);
+    this.debug(`Context obtained, generating code for it`);
+    const res = await ctx.generateCode(args.additionalConfig);
+    return res;
+  }
+
   constructor(private connection: IConnection) {
     super();
     this.debug("setting up AutoRestManager.");
@@ -546,6 +559,8 @@ export class OpenApiDocumentManager extends TextDocuments {
     connection.onHover((position, _cancel) => this.onHover(position));
 
     connection.onDefinition((position, _cancel) => this.onDefinition(position));
+
+    connection.onRequest('autorest.generateCode', (args: any) => this.autoGenerateCode(args));
 
     // on save
     this.onDidSave((p) => this.onSaving(p));
