@@ -1,25 +1,24 @@
 {
   "files.exclude": {
-    "node_modules/**": true,
-    "client/**/*.js": true,
-    "server/**/*.js": true,
-    "lib/**/*.js": true,
-    "test/**/*.js": true,
-    "**/*.js.map": true,
-    "**/*.d.ts": true,
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/.DS_Store": true
+    "dist": true // set this to true to hide the "out" folder with the compiled JS files
+    ,
+    "node_modules": true
   },
+  "search.exclude": {
+    "out": true // set this to false to include "out" folder in search results
+  },
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "typescript.tsc.autoDetect": "off",
   "[typescript]": {
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
     "editor.tabSize": 2,
     "editor.detectIndentation": false
   },
-  "files.associations": {
-    "*.iced": "coffeescript"
-  },
-  	"typescript.tsdk": "./node_modules/typescript/lib"
+  "[json]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false
+  }
 }

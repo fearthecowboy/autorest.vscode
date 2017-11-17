@@ -188,3 +188,7 @@ server/**/*.js
 lib/**/*.js
 test/**/*.js
 *.js.map
+
+dist
+node_modules
+package-lock.json

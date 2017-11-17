@@ -1,8 +1,8 @@
 language: node_js
 node_js:
-  - "6.9.5"
+  - "7.10"
 install:
   # node packages
   - npm install
 script:
-  - gulp build
+  - npm run compile

@@ -17,4 +17,5 @@ export interface AutoRestSettings {
   debug: boolean;
   runtimeId: string;
   minimumAutoRestVersion: string;
+  configuration: any;
 }

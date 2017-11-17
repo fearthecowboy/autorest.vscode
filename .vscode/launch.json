@@ -1,25 +1,18 @@
 {
   "version": "0.2.0",
-    "compounds": [
+  "compounds": [
     {
       "name": "Both",
       "configurations": [
-        "Client Side",
-        "Server Side"
+        "client",
+        "server"
       ]
     }
   ],
+  // List of configurations. Add new configurations or edit existing ones.
   "configurations": [
-        {
-      "name": "Server Side",
-      "type": "node",
-      "request": "attach",
-      "port": 6009,
-      "sourceMaps": true,
-      "protocol": "legacy"
-    },
     {
-      "name": "Client Side",
+      "name": "client",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
@@ -27,19 +20,23 @@
         "--extensionDevelopmentPath=${workspaceRoot}"
       ],
       "stopOnEntry": false,
-      "sourceMaps": true
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceRoot}/dist/**/*.js"
+      ]
     },
     {
-      "name": "Launch Tests",
-      "type": "extensionHost",
-      "request": "launch",
-      "runtimeExecutable": "${execPath}",
-      "args": [
-        "--extensionDevelopmentPath=${workspaceRoot}/src/vscode-autorest",
-        "--extensionTestsPath=${workspaceRoot}/src/vscode-autorest"
-      ],
-      "stopOnEntry": false,
-      "sourceMaps": true
+      "name": "server",
+      "type": "node",
+      "request": "attach",
+      "protocol": "inspector",
+      "port": 6009,
+      "timeout": 600000,
+      "trace": true,
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceRoot}/dist/**/*.js"
+      ]
     }
   ]
 }

@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
     "alwaysStrict": true,
     "forceConsistentCasingInFileNames": false,
-    "module": "commonjs",
     "noEmitOnError": true,
     "noImplicitAny": false,
     "noImplicitReturns": true,
@@ -10,15 +11,16 @@
     "sourceMap": true,
     "strictNullChecks": false,
     "stripInternal": true,
-    "noEmitHelpers": true,
-    "target": "es2016",
+    "target": "es2017",
+    "module": "commonjs",
     "types": [
       "node"
     ],
     "moduleResolution": "node",
     "lib": [
-      "esnext"
+      "es2016"
     ],
+    "outDir": "./dist",
     "newLine": "LF",
     "experimentalDecorators": true
   },
