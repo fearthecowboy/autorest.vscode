@@ -1,0 +1,1 @@
+@code --extensionDevelopmentPath=%~dp0 %*
