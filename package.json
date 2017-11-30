@@ -140,8 +140,8 @@
     "compile": "tsc -p ./",
     "watch": "tsc -w -p ./",
     "start": "code --extensionDevelopmentPath=%cd%",
-    "prepare": "tsc -p .",
+    "prepare": "node ../node_modules/vscode/bin/install && tsc -p .",
     "update-vscode": "node ./node_modules/vscode/bin/install",
-    "postinstall": "node ./node_modules/vscode/bin/install"
+    "_postinstall": "node ./node_modules/vscode/bin/install"
   }
 }
