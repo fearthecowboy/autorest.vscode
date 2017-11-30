@@ -139,7 +139,8 @@
     "vscode:prepublish": "tsc -p ./",
     "compile": "tsc -p ./",
     "watch": "tsc -w -p ./",
-    "prepare": "dir && node ../node_modules/vscode/bin/install && tsc -p . ",
+    "start": "code --extensionDevelopmentPath=%cd%",
+    "prepare": "tsc -p .",
     "update-vscode": "node ./node_modules/vscode/bin/install",
     "postinstall": "node ./node_modules/vscode/bin/install"
   }
